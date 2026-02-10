@@ -1,0 +1,46 @@
+# role assignment
+env_config:
+  n_player: 9
+  n_role: 5
+  n_werewolf: 3
+  n_seer: 1
+  n_guard: 1
+  n_witch: 1
+  n_villager: 3
+  n_hunter: 0
+
+agent_config:
+  werewolf:
+    model_type: gpt
+    model_params:
+      llm: "qwen-8b-werewolf"
+      temperature: 0.7
+      port: 8000
+
+  villager:
+    model_type: gpt
+    model_params:
+      llm: "qwen-8b-werewolf"
+      temperature: 0.5
+      port: 8000
+
+  seer:
+    model_type: gpt
+    model_params:
+      llm: "qwen-8b-werewolf"
+      temperature: 0.5
+      port: 8000 
+
+  witch:
+    model_type: gpt
+    model_params:
+      llm: "qwen-8b-werewolf" 
+      temperature: 0.5
+      port: 8000
+
+  guard:
+    model_type: gpt
+    model_params:
+      llm: "qwen-8b-werewolf" 
+      temperature: 0.5
+      port: 8000

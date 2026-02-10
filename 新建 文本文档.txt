@@ -1,0 +1,70 @@
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY
+
+export OPENAI_BASE_URL="http://localhost:8000/v1"
+export OPENAI_API_KEY="empty"
+export CUDA_VISIBLE_DEVICES=""
+
+
+echo "=== restarting GPU 1 (CPU mode) ==="
+for i in {1..25}
+do
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    SAVE_PATH="expresses/gpu_0/game_${i}_${TIMESTAMP}"
+    mkdir -p "$SAVE_PATH"
+    
+    echo "------------------------------------------------"
+    echo " GPU 0 Round $i (Port 8001)"
+    echo "------------------------------------------------"
+    
+    python -u run_battle.py --config configs/gpt4_vs_makto.yaml --log_save_path "$SAVE_PATH"
+    
+    sleep 3
+done
+
+
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY
+export OPENAI_BASE_URL="http://localhost:8001/v1"
+export OPENAI_API_KEY="empty"
+export CUDA_VISIBLE_DEVICES=""
+
+
+echo "=== restarting GPU 1 (CPU mode) ==="
+for i in {26..50}
+do
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    SAVE_PATH="expresses/gpu_1/game_${i}_${TIMESTAMP}"
+    mkdir -p "$SAVE_PATH"
+    
+    echo "------------------------------------------------"
+    echo " GPU 1 Round $i (Port 8001)"
+    echo "------------------------------------------------"
+    
+    python -u run_battle.py --config configs/gpt4_vs_makto.yaml --log_save_path "$SAVE_PATH"
+    
+    sleep 3
+done
+
+ssh -p 44733 root@connect.nma1.seetacloud.com
+
+VLLM_USE_V1=0 CUDA_VISIBLE_DEVICES=0 NCCL_P2P_DISABLE=1 python -m vllm.entrypoints.openai.api_server \
+    --model /root/autodl-tmp/models/Qwen3-8B \
+    --served-model-name qwen-8b-werewolf \
+    --port 8000 \
+    --gpu-memory-utilization 0.8 \
+    --max-model-len 32000 \
+    --distributed-executor-backend mp
+
+
+VLLM_USE_V1=0 CUDA_VISIBLE_DEVICES=1 NCCL_P2P_DISABLE=1 python -m vllm.entrypoints.openai.api_server \
+    --model /root/autodl-tmp/models/Qwen3-8B \
+    --served-model-name qwen-8b-werewolf \
+    --port 8001 \
+    --gpu-memory-utilization 0.8 \
+    --max-model-len 32000 \
+    --distributed-executor-backend mp
+
+tmux attach -t gpu1_exp
+
+tmux attach -t makto_exp
+
+scp -P 44733 run_battle.py root@connect.nma1.seetacloud.com:/root/autodl-tmp/MaKTO-Werewolf-main/

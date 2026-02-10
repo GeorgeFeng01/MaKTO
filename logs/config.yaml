@@ -1,0 +1,35 @@
+agent_config:
+  guard:
+    model_params:
+      llm: qwen-8b-werewolf
+      temperature: 0.5
+    model_type: gpt
+  seer:
+    model_params:
+      llm: qwen-8b-werewolf
+      temperature: 0.5
+    model_type: gpt
+  villager:
+    model_params:
+      llm: qwen-8b-werewolf
+      temperature: 0.5
+    model_type: gpt
+  werewolf:
+    model_params:
+      llm: qwen-8b-werewolf
+      temperature: 0.7
+    model_type: gpt
+  witch:
+    model_params:
+      llm: qwen-8b-werewolf
+      temperature: 0.5
+    model_type: gpt
+env_config:
+  n_guard: 1
+  n_hunter: 0
+  n_player: 9
+  n_role: 5
+  n_seer: 1
+  n_villager: 3
+  n_werewolf: 3
+  n_witch: 1
